@@ -9,16 +9,88 @@ noApp = (app) -> "Could not find an app with the name '#{app}'"
 
 
 
-exports.runTests = (store, clean) ->
+exports.runTests = (storeCreator, clean) ->
 
-  demoApp = (name, callback) ->
-    store.createUser 'locke', 'something-something-unqiue@mail.com', { password: 'some-password' }, noErr ->
-      store.createApp 'something-something-unqiue@mail.com', name, noErr ->
-        callback()
+  describe 'the store, when first connected to,', ->
+
+    store = null
+
+    beforeEach (done) ->
+      store = storeCreator()
+      done()
+
+    it "should already have a locke app", (done) ->
+      store.createUser 'locke', 'email@test.com', { password: 'psspww' }, noErr ->
+        done()
+
+    it "should already have a locke app", (done) ->
+      store.createApp 'test@user.com', 'locke', (err) ->
+        err.should.eql noUser('locke', 'test@user.com')
+        done()
+
+    it "should already have a locke app", (done) ->
+      store.removeUser 'locke', 'test@user.com', (err) ->
+        err.should.eql noUser('locke', 'test@user.com')
+        done()
+
+    it "should already have a locke app", (done) ->
+      store.getUser 'locke', 'test@user.com', noErr (data) ->
+        should.not.exist data
+        done()
+
+    it "should already have a locke app", (done) ->
+      store.setUserData 'locke', 'test@user.com', {}, (err) ->
+        err.should.eql noUser('locke', 'test@user.com')
+        done()
+
+    it "should already have a locke app", (done) ->
+      store.removeAllTokens 'locke', 'test@user.com', 'auth', (err) ->
+        err.should.eql noUser('locke', 'test@user.com')
+        done()
+
+    it "should already have a locke app", (done) ->
+      store.comparePassword 'locke', 'test@user.com', 'password', (err) ->
+        err.should.eql noUser('locke', 'test@user.com')
+        done()
+
+    it "should already have a locke app", (done) ->
+      store.compareToken 'locke', 'test@user.com', 'type', 'name', (err) ->
+        err.should.eql noUser('locke', 'test@user.com')
+        done()
+
+    it "should already have a locke app", (done) ->
+      store.addToken 'locke', 'test@user.com', 'type', 'name', {}, (err) ->
+        err.should.eql noUser('locke', 'test@user.com')
+        done()
+
+    it "should already have a locke app", (done) ->
+      store.removeToken 'locke', 'test@user.com', 'auth', 'name', (err) ->
+        err.should.eql noUser('locke', 'test@user.com')
+        done()
+
+    it "should already have a locke app", (done) ->
+      store.deleteApp 'locke', (err) ->
+        err.should.eql "It is not possible to delete the app 'locke'"
+        done()
+
+    it "should already have a locke app", (done) ->
+      store.getApps 'test@user.com', (err) ->
+        err.should.eql noUser('locke', 'test@user.com')
+        done()
+
+
 
   describe 'the store', ->
 
-    beforeEach(clean)
+    demoApp = (name, callback) ->
+      store.createUser 'locke', 'something-something-unqiue@mail.com', { password: 'some-password' }, noErr ->
+        store.createApp 'something-something-unqiue@mail.com', name, noErr ->
+          callback()
+
+    store = storeCreator()
+
+    beforeEach (done) ->
+      clean(store, done)
 
     ##
     ## Interface

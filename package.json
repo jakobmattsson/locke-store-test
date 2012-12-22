@@ -1,7 +1,7 @@
 {
   "name": "locke-store-test",
   "description": "A test suite for locke storages",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "main": "./lib/test.js",
   "author": "Jakob Mattsson <jakob.mattsson@gmail.com> (jakobmattsson.se)",
   "engines": {
