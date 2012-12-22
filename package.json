@@ -1,0 +1,19 @@
+{
+  "name": "locke-store-test",
+  "description": "A test suite for locke storages",
+  "version": "0.0.1",
+  "main": "./lib/test.js",
+  "author": "Jakob Mattsson <jakob.mattsson@gmail.com> (jakobmattsson.se)",
+  "engines": {
+    "node": ">= 0.6.x"
+  },
+  "dependencies": {
+    "should": "1.2.1"
+  },
+  "devDependencies": {
+    "coffee-script": "1.4.0"
+  },
+  "scripts": {
+    "prepublish": "coffee -co lib src"
+  }
+}
