@@ -7,6 +7,11 @@ noErr = (f) -> (err, rest...) ->
 noUser = (app, email) -> "There is no user with the email '#{email}' for the app '#{app}'"
 noApp = (app) -> "Could not find an app with the name '#{app}'"
 
+isError = (err, msg) ->
+  err.should.be.an.instanceof Error
+  err.message.should.eql msg
+  err.toString().should.eql "Error: #{msg}"
+
 
 
 exports.runTests = (storeCreator, clean) ->
@@ -25,12 +30,12 @@ exports.runTests = (storeCreator, clean) ->
 
     it "should already have a locke app", (done) ->
       store.createApp 'test@user.com', 'locke', (err) ->
-        err.should.eql noUser('locke', 'test@user.com')
+        isError err, noUser('locke', 'test@user.com')
         done()
 
     it "should already have a locke app", (done) ->
       store.removeUser 'locke', 'test@user.com', (err) ->
-        err.should.eql noUser('locke', 'test@user.com')
+        isError err, noUser('locke', 'test@user.com')
         done()
 
     it "should already have a locke app", (done) ->
@@ -40,42 +45,42 @@ exports.runTests = (storeCreator, clean) ->
 
     it "should already have a locke app", (done) ->
       store.setUserData 'locke', 'test@user.com', {}, (err) ->
-        err.should.eql noUser('locke', 'test@user.com')
+        isError err, noUser('locke', 'test@user.com')
         done()
 
     it "should already have a locke app", (done) ->
       store.removeAllTokens 'locke', 'test@user.com', 'auth', (err) ->
-        err.should.eql noUser('locke', 'test@user.com')
+        isError err, noUser('locke', 'test@user.com')
         done()
 
     it "should already have a locke app", (done) ->
       store.comparePassword 'locke', 'test@user.com', 'password', (err) ->
-        err.should.eql noUser('locke', 'test@user.com')
+        isError err, noUser('locke', 'test@user.com')
         done()
 
     it "should already have a locke app", (done) ->
       store.compareToken 'locke', 'test@user.com', 'type', 'name', (err) ->
-        err.should.eql noUser('locke', 'test@user.com')
+        isError err, noUser('locke', 'test@user.com')
         done()
 
     it "should already have a locke app", (done) ->
       store.addToken 'locke', 'test@user.com', 'type', 'name', {}, (err) ->
-        err.should.eql noUser('locke', 'test@user.com')
+        isError err, noUser('locke', 'test@user.com')
         done()
 
     it "should already have a locke app", (done) ->
       store.removeToken 'locke', 'test@user.com', 'auth', 'name', (err) ->
-        err.should.eql noUser('locke', 'test@user.com')
+        isError err, noUser('locke', 'test@user.com')
         done()
 
     it "should already have a locke app", (done) ->
       store.deleteApp 'locke', (err) ->
-        err.should.eql "It is not possible to delete the app 'locke'"
+        isError(err, "It is not possible to delete the app 'locke'")
         done()
 
     it "should already have a locke app", (done) ->
       store.getApps 'test@user.com', (err) ->
-        err.should.eql noUser('locke', 'test@user.com')
+        isError err, noUser('locke', 'test@user.com')
         done()
 
 
@@ -129,13 +134,13 @@ exports.runTests = (storeCreator, clean) ->
 
     it "should prevent attempts to create a user for a non-existing app", (done) ->
       store.createUser 'does-not-exist', 'test@user.com', { password: 'pwwpas' }, (err) ->
-        err.should.eql noApp('does-not-exist')
+        isError err, noApp('does-not-exist')
         done()
 
     it "should prevent attempts to create a user that already exists", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'some_password' }, noErr ->
         store.createUser 'locke', 'test@user.com', { password: 'another_password' }, (err) ->
-          err.should.eql "User 'test@user.com' already exists for the app 'locke'"
+          isError err, "User 'test@user.com' already exists for the app 'locke'"
           done()
 
     it "should allow creating a user with a very short password", (done) ->
@@ -144,32 +149,32 @@ exports.runTests = (storeCreator, clean) ->
 
     it "should not allow creating a user with a password that is not a string", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 56 }, (err) ->
-        err.should.eql 'Password must be a non-empty string'
+        isError err, 'Password must be a non-empty string'
         done()
 
     it "should not allow creating a user with a password that is an empty string", (done) ->
       store.createUser 'locke', 'test@user.com', { password: '' }, (err) ->
-        err.should.eql 'Password must be a non-empty string'
+        isError err, 'Password must be a non-empty string'
         done()
 
     it "should not allow the user data object to be left out when creating a user", (done) ->
       store.createUser 'locke', 'test@user.com', null, (err) ->
-        err.should.eql 'Password cannot be null'
+        isError err, 'Password cannot be null'
         done()
 
     it "should not allow null-passwords", (done) ->
       store.createUser 'locke', 'test@user.com', { password: null }, (err) ->
-        err.should.eql 'Password cannot be null'
+        isError err, 'Password cannot be null'
         done()
 
     it "should not allow lack of password when creating a user", (done) ->
       store.createUser 'locke', 'test@user.com', { }, (err) ->
-        err.should.eql 'Password cannot be null'
+        isError err, 'Password cannot be null'
         done()
 
     it "should not allow undefined-passwords", (done) ->
       store.createUser 'locke', 'test@user.com', { password: undefined }, (err) ->
-        err.should.eql 'Password cannot be null'
+        isError err, 'Password cannot be null'
         done()
 
     it "should allow creating a user with a very common password", (done) ->
@@ -179,13 +184,13 @@ exports.runTests = (storeCreator, clean) ->
     it "should prevent attempts to authenticate for a non-existing app", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'some_password' }, noErr ->
         store.comparePassword 'non-existing48585238', 'test@user.com', 'some_password', (err) ->
-          err.should.eql noApp('non-existing48585238')
+          isError err, noApp('non-existing48585238')
           done()
 
     it "should prevent attempts to authenticate for a non-existing user", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'some_password' }, noErr ->
         store.comparePassword 'locke', 'non-existing-user123', 'some_password', (err) ->
-          err.should.eql noUser('locke', 'non-existing-user123')
+          isError err, noUser('locke', 'non-existing-user123')
           done()
 
     it "should prevent attempts to authenticate with an invalid password", (done) ->
@@ -219,28 +224,28 @@ exports.runTests = (storeCreator, clean) ->
       store.createUser 'locke', 'test@user.com', { password: 'pwwpas' }, noErr ->
         store.addToken 'locke', 'test@user.com', 'auth', 'token-name', { }, noErr ->
           store.compareToken 'non-existing48585238', 'test@user.com', 'auth', 'token-name', (err) ->
-            err.should.eql noApp('non-existing48585238')
+            isError err, noApp('non-existing48585238')
             done()
 
     it "should prevent authentication using an invalid username", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'pwwpas' }, noErr ->
         store.addToken 'locke', 'test@user.com', 'auth', 'token-name', { }, noErr ->
           store.compareToken 'locke', 'non-existing534752735', 'auth', 'token-name', (err) ->
-            err.should.eql noUser('locke', 'non-existing534752735')
+            isError err, noUser('locke', 'non-existing534752735')
             done()
 
     it "should prevent authentication using an incorrect token label", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'pwwpas' }, noErr ->
         store.addToken 'locke', 'test@user.com', 'auth', 'token-name', { }, noErr ->
           store.compareToken 'locke', 'test@user.com', 'auth-other', 'token-name', (err) ->
-            err.should.eql "Incorrect token"
+            isError err, "Incorrect token"
             done()
 
     it "should prevent authentication using an incorrect token value", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'pwwpas' }, noErr ->
         store.addToken 'locke', 'test@user.com', 'auth', 'token-name', { }, noErr ->
           store.compareToken 'locke', 'test@user.com', 'auth', 'token-name-other', (err) ->
-            err.should.eql "Incorrect token"
+            isError err, "Incorrect token"
             done()
 
     it "should prevent authentication using another users password", (done) ->
@@ -256,7 +261,7 @@ exports.runTests = (storeCreator, clean) ->
           store.addToken 'locke', 'test@user.com', 'auth', 'token-name-1', { }, noErr ->
             store.addToken 'locke', 'test2@user.com', 'auth', 'token-name-2', { }, noErr ->
               store.compareToken 'locke', 'test@user.com', 'auth', 'token-name-2', (err) ->
-                err.should.eql "Incorrect token"
+                isError err, "Incorrect token"
                 done()
 
     it "should allow authentication using an old, but still valid, token", (done) ->
@@ -286,21 +291,21 @@ exports.runTests = (storeCreator, clean) ->
 
     it "should prevent apps from being created without an email of an actual locke-user", (done) ->
       store.createApp 'test@user.com', 'myapp', (err) ->
-        err.should.eql noUser('locke', 'test@user.com')
+        isError err, noUser('locke', 'test@user.com')
         done()
 
 
     it "should prevent the user from creating an app called locke", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'some-password' }, noErr ->
         store.createApp 'test@user.com', 'locke', (err) ->
-          err.should.eql "App name 'locke' is already in use"
+          isError err, "App name 'locke' is already in use"
           done()
 
     it "should prevent the user from defining a new app name that has already been created by the same user", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'some-password' }, noErr ->
         store.createApp 'test@user.com', 'sally', noErr ->
           store.createApp 'test@user.com', 'sally', (err) ->
-            err.should.eql "App name 'sally' is already in use"
+            isError err, "App name 'sally' is already in use"
             done()
 
     it "should prevent the user from defining an app name that another user has already taken", (done) ->
@@ -308,14 +313,14 @@ exports.runTests = (storeCreator, clean) ->
         store.createUser 'locke', 'test2@user.com', { password: 'some-password' }, noErr ->
           store.createApp 'test1@user.com', 'sally', noErr ->
             store.createApp 'test2@user.com', 'sally', (err) ->
-              err.should.eql "App name 'sally' is already in use"
+              isError err, "App name 'sally' is already in use"
               done()
 
     it "should prevent non-existing users from getting lists of apps", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'some-password' }, noErr ->
         store.createApp 'test@user.com', 'myapp', noErr ->
           store.getApps 'non-existing@user.com', (err) ->
-            err.should.eql noUser('locke', 'non-existing@user.com')
+            isError err, noUser('locke', 'non-existing@user.com')
             done()
 
     it "should prevent non-locke users from getting lists of apps", (done) ->
@@ -323,7 +328,7 @@ exports.runTests = (storeCreator, clean) ->
         store.createApp 'test@user.com', 'myapp', noErr ->
           store.createUser 'myapp', 'myapp@user.com', { password: 'some-password' }, noErr ->
             store.getApps 'myapp@user.com', (err) ->
-              err.should.eql noUser('locke', 'myapp@user.com')
+              isError err, noUser('locke', 'myapp@user.com')
               done()
 
     it "should be possible to create multiple apps", (done) ->
@@ -379,7 +384,7 @@ exports.runTests = (storeCreator, clean) ->
               val.should.eql {}
               store.removeToken 'sally', 'test@user.com', 'auth', 'token-name-1', noErr ->
                 store.compareToken 'sally', 'test@user.com', 'auth', 'token-name-1', (err) ->
-                  err.should.eql 'Incorrect token'
+                  isError err, 'Incorrect token'
                   done()
 
     it "should allow removing all tokens at once", (done) ->
@@ -389,9 +394,9 @@ exports.runTests = (storeCreator, clean) ->
             store.addToken 'sally', 'test@user.com', 'auth', 'token-name-2', { }, noErr ->
               store.removeAllTokens 'sally', 'test@user.com', 'auth', noErr ->
                 store.compareToken 'sally', 'test@user.com', 'auth', 'token-name-1', (err) ->
-                  err.should.eql 'Incorrect token'
+                  isError err, 'Incorrect token'
                   store.compareToken 'sally', 'test@user.com', 'auth', 'token-name-2', (err) ->
-                    err.should.eql 'Incorrect token'
+                    isError err, 'Incorrect token'
                     done()
 
     it "should let all tokens except the removed one remain valid", (done) ->
@@ -401,20 +406,20 @@ exports.runTests = (storeCreator, clean) ->
             store.addToken 'sally', 'test@user.com', 'auth', 'token-name-2', { }, noErr ->
               store.removeToken 'sally', 'test@user.com', 'auth', 'token-name-1', noErr ->
                 store.compareToken 'sally', 'test@user.com', 'auth', 'token-name-1', (err) ->
-                  err.should.eql 'Incorrect token'
+                  isError err, 'Incorrect token'
                   store.compareToken 'sally', 'test@user.com', 'auth', 'token-name-2', noErr (val) ->
                     val.should.eql {}
                     done()
 
     it "should not be possible to remove a token for a non-existing app", (done) ->
       store.removeToken 'sally', 'test@user.com', 'auth', 'token-name-1', (err) ->
-        err.should.eql noApp('sally')
+        isError err, noApp('sally')
         done()
 
     it "should not be possible to remove a token for a non-existing user", (done) ->
       demoApp 'sally', ->
         store.removeToken 'sally', 'test@user.com', 'auth', 'token-name-1', (err) ->
-          err.should.eql noUser('sally', 'test@user.com')
+          isError err, noUser('sally', 'test@user.com')
           done()
 
     it "should be possible to remove a single token from a user", (done) ->
@@ -425,13 +430,13 @@ exports.runTests = (storeCreator, clean) ->
 
     it "should not be possible to remove all tokens for a non-existing app", (done) ->
       store.removeAllTokens 'sally', 'test@user.com', 'auth', (err) ->
-        err.should.eql noApp('sally')
+        isError err, noApp('sally')
         done()
 
     it "should not be possible to remove all tokens for a non-existing user", (done) ->
       demoApp 'sally', ->
         store.removeAllTokens 'sally', 'test@user.com', 'auth', (err) ->
-          err.should.eql noUser('sally', 'test@user.com')
+          isError err, noUser('sally', 'test@user.com')
           done()
 
     it "should be possible to remove all tokens from a user", (done) ->
@@ -459,17 +464,17 @@ exports.runTests = (storeCreator, clean) ->
         store.createUser 'sally', 'test@user.com', { password: 'sallyp' }, noErr ->
           store.removeUser 'sally', 'test@user.com', noErr ->
             store.comparePassword 'sally', 'test@user.com', 'sallyp', (err) ->
-              err.should.eql noUser('sally', 'test@user.com')
+              isError err, noUser('sally', 'test@user.com')
               done()
 
     it "should raise an error when trying to remove a user from an app that does not exist", (done) ->
       store.removeUser 'sally', 'test@user.com', (err) ->
-        err.should.eql noApp('sally')
+        isError err, noApp('sally')
         done()
 
     it "should raise an error when trying to remove a user that does not exist", (done) ->
       store.removeUser 'locke', 'test@user.com', (err) ->
-        err.should.eql noUser('locke', 'test@user.com')
+        isError err, noUser('locke', 'test@user.com')
         done()
 
     ##
@@ -487,25 +492,25 @@ exports.runTests = (storeCreator, clean) ->
       store.createUser 'locke', 'test@user.com', { password: 'some-password' }, noErr ->
         store.setUserData 'locke', 'test@user.com', { password: 'updated-password' }, noErr ->
           store.comparePassword 'locke', 'test2@user.com', 'updated-password', (err) ->
-            err.should.eql noUser('locke', 'test2@user.com')
+            isError err, noUser('locke', 'test2@user.com')
             done()
 
     it "should not be possible to change password to a null-password", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'some-password' }, noErr ->
         store.setUserData 'locke', 'test@user.com', { password: null }, (err) ->
-          err.should.eql 'Password cannot be null'
+          isError err, 'Password cannot be null'
           done()
 
     it "should not be possible to change password to something that is not a string", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'some-password' }, noErr ->
         store.setUserData 'locke', 'test@user.com', { password: 56 }, (err) ->
-          err.should.eql 'Password must be a non-empty string'
+          isError err, 'Password must be a non-empty string'
           done()
 
     it "should not be possible to change password to the empty string", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'some-password' }, noErr ->
         store.setUserData 'locke', 'test@user.com', { password: '' }, (err) ->
-          err.should.eql 'Password must be a non-empty string'
+          isError err, 'Password must be a non-empty string'
           done()
 
     ##
@@ -522,7 +527,7 @@ exports.runTests = (storeCreator, clean) ->
 
     it "should not be possible to delete the locke app", (done) ->
       store.deleteApp 'locke', (err) ->
-        err.should.eql "It is not possible to delete the app 'locke'"
+        isError(err, "It is not possible to delete the app 'locke'")
         done()
 
 
@@ -545,7 +550,7 @@ exports.runTests = (storeCreator, clean) ->
     it "should not be possible to get user data for an app that does not exist", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'test' }, noErr ->
         store.getUser 'locke2', 'test@user.com', (err) ->
-          err.should.eql noApp('locke2')
+          isError err, noApp('locke2')
           done()
 
     it "should not be possible to get user data for a user that does not exist", (done) ->
@@ -557,28 +562,28 @@ exports.runTests = (storeCreator, clean) ->
     it "should not be possible to run setUserData with an invalid app", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'test' }, noErr ->
         store.setUserData 'locke2', 'test@user.com', { x: 1 }, (err) ->
-          err.should.eql noApp('locke2')
+          isError err, noApp('locke2')
           done()
 
     it "should not be possible to run setUserData with an invalid user", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'test' }, noErr ->
         store.setUserData 'locke', 'test2@user.com', { x: 1 }, (err) ->
-          err.should.eql noUser('locke', 'test2@user.com')
+          isError err, noUser('locke', 'test2@user.com')
           done()
 
     it "should not be possible to run addToken with an invalid app", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'test' }, noErr ->
         store.addToken 'locke2', 'test@user.com', 'type', 'name', 'value', (err) ->
-          err.should.eql noApp('locke2')
+          isError err, noApp('locke2')
           done()
 
     it "should not be possible to run addToken with an invalid user", (done) ->
       store.createUser 'locke', 'test@user.com', { password: 'test' }, noErr ->
         store.addToken 'locke', 'test2@user.com', 'type', 'name', 'value', (err) ->
-          err.should.eql noUser('locke', 'test2@user.com')
+          isError err, noUser('locke', 'test2@user.com')
           done()
 
     it "should not be possible to delete an app that does not exist", (done) ->
       store.deleteApp 'non-existing', (err) ->
-        err.should.eql noApp('non-existing')
+        isError err, noApp('non-existing')
         done()
